@@ -65,22 +65,24 @@ class createAlbums(View):
         user = User.objects.get(username=datas["username"]);
         # {'name': '', 'region': '', 'resource': '公开画册', 'desc': '', 'imgList': [{'uid': 1652102306770}]}
         # 1. 判断是否符合规范
-        # if datas["imgList"] is None:
-        #     return JsonResponse({'code': 400, "errmsg": '图片上传不符合规范'})
-        # if 0 == len(datas["imgList"]) < 7:
-        #     return JsonResponse({'code': 400, "errmsg": '最少上传6张图片！'})
+        if len(datas["imgLists"]) < 7:
+            return JsonResponse({'code': 400, "errmsg": '最少上传6张图片！'})
         if (datas["title"] and datas["region"] and datas["resource"] and datas["desc"]) == "":
             return JsonResponse({'code': 400, "errmsg": '画册信息填写不完整！'})
 
+        # 3. 将数据保存到数据库中
         try:
-            als = Albums.objects.create(title=datas["title"],
-                                        album_type=datas["region"],
-                                        ispublic=datas["resource"],
-                                        expostitory=datas["desc"],
-                                        )
+            Albums.objects.create(title=datas["title"],
+                                  album_type=datas["region"],
+                                  ispublic=datas["resource"],
+                                  expostitory=datas["desc"],
+                                  img_list=datas["imgLists"],
+                                  cover_img=datas["defaultImg"],
+                                  creator_id=user.id)
         except Exception as e:
-            return JsonResponse({'code': 400, "errmsg": e})
-        # print(als)
+            print(e)
+            return JsonResponse({'code': 400, "errmsg": "服务器错误创建失败"})
         print(datas)
 
-        return JsonResponse({'code': 200, "errmsg": 'test'})
+        # 返回响应数据
+        return JsonResponse({'code': 200, "errmsg": 'OK'})

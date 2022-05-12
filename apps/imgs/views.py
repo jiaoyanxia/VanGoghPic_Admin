@@ -73,26 +73,22 @@ class AllImagesView(ModelViewSet):
 
 class userUpdata(View):
     def post(self, request, *args, **kwargs):
-        # # - 1 接收参数 校验
-        # image = request.FILES.get('file')
-        # # - 2 把图片上传到fastdfs里 返回一个图片地址
-        # from fdfs_client.client import Fdfs_client
-        # # 创建FastDFS连接对象
-        # client = Fdfs_client('utils/fastdfs/client.conf')
-        # # 上传
-        # result = client.upload_by_buffer(image.read())
-        # if result.get("Status") != 'Upload successed.':
-        #     return Response(status=status.HTTP_400_BAD_REQUEST)
-        # # 取出在fastdfs里的地址  把这个地址 保存到数据库
-        # file_id = result.get("Remote file_id")
-        # print("file_id", file_id)
-
-        # 3 把图片的地址和sku_id一切用模型类SKUImage保存到数据库
-        # Image.objects.create(sku_id=sku_id, image=file_id)
-        # Image.objects.update()
+        # - 1 接收参数 校验
+        image = request.FILES.get('file')
+        # - 2 把图片上传到fastdfs里 返回一个图片地址
+        from fdfs_client.client import Fdfs_client
+        # 创建FastDFS连接对象
+        client = Fdfs_client('utils/fastdfs/client.conf')
+        # 上传
+        result = client.upload_by_buffer(image.read())
+        if result.get("Status") != 'Upload successed.':
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        # 取出在fastdfs里的地址  把这个地址 保存到数据库
+        file_id = result.get("Remote file_id")
+        print("file_id", file_id)
 
         # # - 4 返回响应
-        # return JsonResponse({'code': 200, 'errmsg': 'OK', 'authorImg': file_id})
-        return JsonResponse({'code': 200, 'errmsg': 'OK'})
+        return JsonResponse({'code': 200, 'errmsg': 'OK', 'authorImg': file_id})
+        # return JsonResponse({'code': 200, 'errmsg': 'OK'})
 
 

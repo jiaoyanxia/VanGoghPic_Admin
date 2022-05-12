@@ -6,12 +6,12 @@ from apps.users.models import User
 # 画册
 class Albums(models.Model):
     title = models.CharField(max_length=8, verbose_name="画册标题")
-    stars = models.IntegerField(verbose_name="收藏数量")
-    comments = models.IntegerField(verbose_name="评论数量")
+    stars = models.IntegerField(default=0, verbose_name="收藏数量")
+    comments = models.IntegerField(default=0, verbose_name="评论数量")
     expostitory = models.TextField(verbose_name="画册简介")
     album_type = models.CharField(max_length=8, default="名画", verbose_name="画册类型")
     ispublic = models.BooleanField(default=True, verbose_name="是否公开")
-    created_time = models.DateField(auto_now=False, auto_now_add=False, verbose_name="画册创建时间")
+    created_time = models.DateField(auto_now=False, auto_now_add=True, verbose_name="画册创建时间")
     creator = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="创建者的ID")
     cover_img = models.CharField(default='https://img.afqaq.com/images/2022/04/18/sky1.jpg', max_length=100,
                                  verbose_name='Pic defaltimg')
