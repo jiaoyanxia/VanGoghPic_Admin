@@ -70,6 +70,8 @@ class createAlbums(View):
         if (datas["title"] and datas["region"] and datas["resource"] and datas["desc"]) == "":
             return JsonResponse({'code': 400, "errmsg": '画册信息填写不完整！'})
 
+
+
         # 3. 将数据保存到数据库中
         try:
             Albums.objects.create(title=datas["title"],

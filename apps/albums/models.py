@@ -13,7 +13,7 @@ class Albums(models.Model):
     ispublic = models.BooleanField(default=True, verbose_name="是否公开")
     created_time = models.DateField(auto_now=False, auto_now_add=True, verbose_name="画册创建时间")
     creator = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="创建者的ID")
-    cover_img = models.CharField(default='https://img.afqaq.com/images/2022/04/18/sky1.jpg', max_length=100,
+    cover_img = models.ImageField(default='https://img.afqaq.com/images/2022/04/18/sky1.jpg', max_length=100,
                                  verbose_name='Pic defaltimg')
     img_list = models.TextField(verbose_name="画册中图片的ID")
 
