@@ -64,13 +64,19 @@ class createAlbums(View):
         datas = json.loads(request.body);
         user = User.objects.get(username=datas["username"]);
         # {'name': '', 'region': '', 'resource': '公开画册', 'desc': '', 'imgList': [{'uid': 1652102306770}]}
+
         # 1. 判断是否符合规范
         if len(datas["imgLists"]) < 7:
             return JsonResponse({'code': 400, "errmsg": '最少上传6张图片！'})
         if (datas["title"] and datas["region"] and datas["resource"] and datas["desc"]) == "":
             return JsonResponse({'code': 400, "errmsg": '画册信息填写不完整！'})
 
-
+        # 2. 处理数据
+        # 条件不满足，条件满足
+        datas["resource"] = (True, False)[datas["resource"] == "公开画册"];
+        for item, index in enumerate(datas["imgList"]):
+            print(item);
+            print(index);
 
         # 3. 将数据保存到数据库中
         try:
