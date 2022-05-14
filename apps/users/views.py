@@ -77,6 +77,8 @@ class RegisterView(View):
             return http.JsonResponse({'code': 400, 'errmsg': '注册失败!'})
 
         login(request, user)
+        print(user)
+        print(list(user)[0])
         response = JsonResponse({"code": '0', "errmsg": "OK"})
         response.set_cookie('username', user.username, max_age=3600 * 24 * 15)
         return response
@@ -112,10 +114,6 @@ class LoginView(View):
         datalist = {}
         datalist["id"] = data["id"]
         datalist["username"] = data["username"]
-        datalist["author_img"] = data["author_img"]
-        # datalist["hobby"] = data["hobby"]
-        # datalist["signature"] = data["signature"]
-
         token = str(user.mobile)[-1:-5:-1] + user.username[-3:] + str(time.time())[-7:]
         datalist['token'] = token
         response = JsonResponse({'code': 200, 'errmsg': 'ok', 'data': datalist})
@@ -149,8 +147,7 @@ class myUser(View):
 
 class ReviseUser(View):
     def post(self, request, *args, **kwargs):
-        # # - 1 接收参数 校验
-        # print(json.loads(request.body))
+        # - 1 接收参数 校验
         datas = json.loads(request.body);
         # user = User.objects.filter(username=datas['username']).values()[0];
         # print(user)
@@ -182,6 +179,7 @@ class ReviseUser(View):
         #     user['signature'] = datas['remessage'];
 
         user = User.objects.get(username=datas['username'])
+
         try:
             if datas['reimg'] != '':
                 # image = datas['reimg']

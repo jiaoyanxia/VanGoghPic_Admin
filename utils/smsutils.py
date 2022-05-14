@@ -20,7 +20,6 @@ class SmsUtil:
         sendback = self.smsSdk.sendMessage(tid=tid, mobile=mobile, datas=(code, 5))
         # 把返回值转为字典
         sendback = json.loads(sendback)
-        # "statusCode": "000000"
         if sendback.get("statusCode") == "000000":
             print("发送成功")
         else:

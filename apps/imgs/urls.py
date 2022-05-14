@@ -1,14 +1,15 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from apps.imgs.views import AllType, Images, AllImagesView, userUpdata
+from apps.imgs.views import AllType, Images, AllImagesView, userUpdata, UploadImg
 
 # userUpdata
 
 urlpatterns = [
     path('AllType/', AllType.as_view()),
-    path('imgs/<id>/', Images.as_view()),
+    path('imgs/<arr>/', Images.as_view()),
     path('updata/images', userUpdata.as_view()),
+    path('upload/', UploadImg.as_view())
 ]
 
 # # # 创建router实例

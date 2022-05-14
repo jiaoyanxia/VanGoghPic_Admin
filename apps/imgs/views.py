@@ -1,3 +1,5 @@
+import json
+
 from django.http import JsonResponse
 from django.views import View
 from requests import Response
@@ -23,13 +25,17 @@ class AllType(GenericAPIView):
 
 
 class Images(View):
-    def get(self, request, id):
+    def get(self, request, arr):
         try:
-            imgUrl = Image.objects.filter(category_id=id)
+            imgUrl = Image.objects.filter(category_id=arr)
             imgList = []
+            print(request.GET)
+            print(request.path)
+            for i in arr:
+                print(i)
             for i in imgUrl.values():
                 imgList.append(i)
-            # print(imgList)
+            print(imgList)
         except Exception as e:
             print(e)
             return JsonResponse({"code": 400, "errmsg": 'The type is Error'})
@@ -85,10 +91,23 @@ class userUpdata(View):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         # 取出在fastdfs里的地址  把这个地址 保存到数据库
         file_id = result.get("Remote file_id")
-        print("file_id", file_id)
+        # print("file_id", file_id)
 
         # # - 4 返回响应
         return JsonResponse({'code': 200, 'errmsg': 'OK', 'authorImg': file_id})
         # return JsonResponse({'code': 200, 'errmsg': 'OK'})
 
+class UploadImg(View):
+    def post(self, request, *args, **kwargs):
+        print(json.loads(request.body))
+        # 1. 接收图片数据
+        data = json.loads(request.body);
+        # 2. 循环写入数据库
+        for i in data["imgList"]:
+            try:
+                Image.objects.create(category_id=data["type"], image_link=i);
+            except Exception as e:
+                print(e)
+                return JsonResponse({'code': 400, 'errmsg': '图片上传失败'})
+        return JsonResponse({'code': 200, 'msg': '图片上传成功'})
 

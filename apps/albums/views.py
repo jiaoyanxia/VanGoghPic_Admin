@@ -74,23 +74,33 @@ class createAlbums(View):
         # 2. 处理数据
         # 条件不满足，条件满足
         datas["resource"] = (True, False)[datas["resource"] == "公开画册"];
-        for item, index in enumerate(datas["imgList"]):
-            print(item);
-            print(index);
-
+        datas["imgLists"] = ";".join(datas["imgLists"])
+        print(datas["imgLists"])
         # 3. 将数据保存到数据库中
         try:
-            Albums.objects.create(title=datas["title"],
-                                  album_type=datas["region"],
-                                  ispublic=datas["resource"],
-                                  expostitory=datas["desc"],
-                                  img_list=datas["imgLists"],
-                                  cover_img=datas["defaultImg"],
-                                  creator_id=user.id)
+            alb = Albums.objects.create(title=datas["title"],
+                                        album_type=datas["region"],
+                                        ispublic=datas["resource"],
+                                        expostitory=datas["desc"],
+                                        img_list=datas["imgLists"],
+                                        cover_img=datas["defaultImg"],
+                                        creator_id=user.id)
         except Exception as e:
             print(e)
             return JsonResponse({'code': 400, "errmsg": "服务器错误创建失败"})
-        print(datas)
+
+        # 返回响应数据
+        return JsonResponse({'code': 200, "errmsg": 'OK', "data": alb.id})
+
+
+class getFavorites(View):
+    def get(self, request, *args, **kwargs):
+        # 3. 将数据保存到数据库中
+        try:
+            pass
+        except Exception as e:
+            print(e)
+            return JsonResponse({'code': 400, "errmsg": "服务器错误创建失败"})
 
         # 返回响应数据
         return JsonResponse({'code': 200, "errmsg": 'OK'})
