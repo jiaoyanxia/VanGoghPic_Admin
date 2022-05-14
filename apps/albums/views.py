@@ -49,10 +49,8 @@ class AlbumData(View):
         albumDate = Albums.objects.all().values()
         for item in albumDate:
             albumCreator = item['creator_id']
-            print(albumCreator)
             user = User.objects.get(id=albumCreator)
             s = UserSerializer(user).data
-            print(s)
             for (i, v) in s.items():
                 item[i] = v
             list.append(item)
@@ -94,13 +92,21 @@ class createAlbums(View):
 
 
 class getFavorites(View):
-    def get(self, request, *args, **kwargs):
-        # 3. 将数据保存到数据库中
+    def post(self, request, *args, **kwargs):
+        print(json.loads(request.body))
+        datas = json.loads(request.body)
+        # if datas["islike"] == True:
+        #     pass
+        user_id = User.objects.get(id=datas["user_id"])
+        albums_id = Albums.objects.get(id=datas["albunm_id"])
+        # 将数据保存到数据库中
         try:
-            pass
+            news = UserAlbum.objects.create(user_id=user_id,
+                                            albums_id=albums_id,
+                                            isLike=datas["islike"])
         except Exception as e:
             print(e)
             return JsonResponse({'code': 400, "errmsg": "服务器错误创建失败"})
-
+        print(news)
         # 返回响应数据
         return JsonResponse({'code': 200, "errmsg": 'OK'})

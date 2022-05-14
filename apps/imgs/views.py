@@ -25,17 +25,17 @@ class AllType(GenericAPIView):
 
 
 class Images(View):
-    def get(self, request, arr):
+    def get(self, request, *args, **kwargs):
         try:
-            imgUrl = Image.objects.filter(category_id=arr)
+            # imgUrl = Image.objects.filter(category_id=arr)
             imgList = []
             print(request.GET)
-            print(request.path)
-            for i in arr:
-                print(i)
-            for i in imgUrl.values():
-                imgList.append(i)
-            print(imgList)
+            print(request.body)
+            # for i in arr:
+            #     print(i)
+            # for i in imgUrl.values():
+            #     imgList.append(i)
+            # print(imgList)
         except Exception as e:
             print(e)
             return JsonResponse({"code": 400, "errmsg": 'The type is Error'})
