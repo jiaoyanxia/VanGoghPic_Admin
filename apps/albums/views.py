@@ -50,8 +50,6 @@ class SignAlbumView(View):
             albums_id = Albums.objects.get(id=list['id'])
             # 如果画册关联数据存在
             sea = UserAlbum.objects.get(Q(user_id=user_id.id) & Q(albums_id=albums_id.id));
-            print(user_id.id)
-            print(sea)
             print("有收藏过")
             list["isLike"] = sea.isLike
         except:
@@ -162,6 +160,7 @@ class reFavorites(View):
 class isFavorites(View):
     def post(self, request, *args, **kwargs):
         datas = json.loads(request.body)
+        print(datas)
         user_id = User.objects.get(id=datas["user_id"])
         newList = []
         for i in datas["list"]:
