@@ -7,7 +7,7 @@ from apps.imgs.views import AllType, Images, AllImagesView, userUpdata, UploadIm
 
 urlpatterns = [
     path('AllType/', AllType.as_view()),
-    path('imgs/<arr>/', Images.as_view()),
+    path('imgs/', Images.as_view()),
     path('updata/images', userUpdata.as_view()),
     path('upload/', UploadImg.as_view())
 ]

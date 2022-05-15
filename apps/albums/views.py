@@ -1,5 +1,6 @@
 import json
 
+from django.db.models import Q
 from django.http import JsonResponse
 from django.views import View
 from rest_framework.generics import GenericAPIView
@@ -22,10 +23,13 @@ class AlbumsView(ListModelMixin, GenericAPIView):
 
 
 class SignAlbumView(View):
-    def post(self, request, user_id):
+    def post(self, request, *args, **kwargs):
         list = {}
+        datas = json.loads(request.body)
+        pid = datas["pid"]
+        user_id = datas["user_id"]
         try:
-            albumDate = Albums.objects.filter(id=user_id).values()
+            albumDate = Albums.objects.filter(id=pid).values()
             albumCreator = albumDate[0]['creator_id']
             for (i, v) in albumDate[0].items():
                 list[i] = v
@@ -40,7 +44,19 @@ class SignAlbumView(View):
         except Exception as e:
             print(e)
             return JsonResponse({"code": 400})
-        return JsonResponse({"code": 200, 'datalist': list})
+
+        try:
+            user_id = User.objects.get(id=user_id)
+            albums_id = Albums.objects.get(id=list['id'])
+            # 如果画册关联数据存在
+            sea = UserAlbum.objects.get(Q(user_id=user_id.id) & Q(albums_id=albums_id.id));
+            print(user_id.id)
+            print(sea)
+            print("有收藏过")
+            list["isLike"] = sea.isLike
+        except:
+            print("没有收藏过")
+        return JsonResponse({"code": 200, "msg": "OK", 'datalist': list})
 
 
 class AlbumData(View):
@@ -95,18 +111,80 @@ class getFavorites(View):
     def post(self, request, *args, **kwargs):
         print(json.loads(request.body))
         datas = json.loads(request.body)
-        # if datas["islike"] == True:
-        #     pass
         user_id = User.objects.get(id=datas["user_id"])
         albums_id = Albums.objects.get(id=datas["albunm_id"])
-        # 将数据保存到数据库中
         try:
-            news = UserAlbum.objects.create(user_id=user_id,
-                                            albums_id=albums_id,
-                                            isLike=datas["islike"])
+            try:
+                # 如果画册关联数据已经存在
+                sea = UserAlbum.objects.get(Q(user_id=user_id) & Q(albums_id=albums_id));
+                # sea.isLike = [True, False](sea.isLike == 1)
+                sea.isLike = True
+                sea.save()
+                newOption = sea.isLike
+                print("更改关联数据")
+            except:
+                try:
+                    news = UserAlbum.objects.create(user_id=user_id,
+                                                    albums_id=albums_id,
+                                                    isLike=datas["islike"])
+                    newOption = news.isLike
+                    print("创建关联数据")
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'code': 400, "errmsg": "创建失败"})
+        except Exception as e:
+            return JsonResponse({'code': 400, "errmsg": "服务器错误"})
+
+        print(newOption)
+        # 将数据保存到数据库中
+
+        # 返回响应数据
+        return JsonResponse({'code': 200, "errmsg": '收藏成功', "data": newOption})
+
+
+class reFavorites(View):
+    def post(self, request, *args, **kwargs):
+        datas = json.loads(request.body)
+        user_id = User.objects.get(id=datas["user_id"])
+        albums_id = Albums.objects.get(id=datas["albunm_id"])
+        # 2. 数据获取
+        try:
+            sea = UserAlbum.objects.get(Q(user_id=user_id) & Q(albums_id=albums_id))
+            sea.isLike = False
+            sea.save()
         except Exception as e:
             print(e)
-            return JsonResponse({'code': 400, "errmsg": "服务器错误创建失败"})
-        print(news)
+            return JsonResponse({'code': 400, "errmsg": 'e'})
         # 返回响应数据
-        return JsonResponse({'code': 200, "errmsg": 'OK'})
+        return JsonResponse({'code': 200, "errmsg": '取消收藏', "data": sea.isLike})
+
+
+class isFavorites(View):
+    def post(self, request, *args, **kwargs):
+        datas = json.loads(request.body)
+        user_id = User.objects.get(id=datas["user_id"])
+        newList = []
+        for i in datas["list"]:
+            albums_id = Albums.objects.get(id=i["id"])
+            try:
+                sea = UserAlbum.objects.get(Q(user_id=user_id.id) & Q(albums_id=albums_id.id))
+                if sea.isLike == True:
+                    newList.append(i)
+            except:
+                pass
+        # 返回响应数据
+        return JsonResponse({'code': 200, "errmsg": '收藏', "data": newList})
+
+
+class myFavorites(View):
+    def post(self, request, *args, **kwargs):
+        datas = json.loads(request.body)
+        user_id = User.objects.get(id=datas["user_id"])
+        list = []
+        for i in datas["list"]:
+            # print(i["creator_id"])
+            # print(user_id)
+            if i["creator_id"] == user_id.id:
+                list.append(i)
+        # 返回响应数据
+        return JsonResponse({'code': 200, "errmsg": "我的", "data": list})

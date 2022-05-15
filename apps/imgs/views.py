@@ -24,23 +24,36 @@ class AllType(GenericAPIView):
         return JsonResponse({"code": 200, "errmsg": 'OK', 'lists': lists})
 
 
+# class Images(View):
+#     def post(self, request, *args, **kwargs):
+#         datas = json.loads(request.body)
+#         print(datas)
+#         try:
+#             imgUrl = Image.objects.filter(category_id=datas["Goodid"])
+#             imgList = []
+#             for i in imgUrl.values():
+#                 imgList.append(i)
+#         except Exception as e:
+#             print(e)
+#             return JsonResponse({"code": 400, "errmsg": 'The type is Error'})
+#         dict = {}
+#         dict["total_num"] = len(imgList)
+#         dict["imgList"] = imgList
+#         return JsonResponse({"code": 200, "errmsg": 'OK', 'data': dict})
+
+
 class Images(View):
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
+        id = json.loads(request.body)
         try:
-            # imgUrl = Image.objects.filter(category_id=arr)
+            imgUrl = Image.objects.filter(category_id=id)
             imgList = []
-            print(request.GET)
-            print(request.body)
-            # for i in arr:
-            #     print(i)
-            # for i in imgUrl.values():
-            #     imgList.append(i)
-            # print(imgList)
+            for i in imgUrl.values():
+                imgList.append(i)
         except Exception as e:
             print(e)
             return JsonResponse({"code": 400, "errmsg": 'The type is Error'})
-
-        return JsonResponse({"code": 200, "errmsg": 'OK', 'imgList': imgList})
+        return JsonResponse({"code": 200, "errmsg": 'OK', 'imgList': imgList[:50]})
 
 
 class AllImagesView(ModelViewSet):
@@ -97,6 +110,7 @@ class userUpdata(View):
         return JsonResponse({'code': 200, 'errmsg': 'OK', 'authorImg': file_id})
         # return JsonResponse({'code': 200, 'errmsg': 'OK'})
 
+
 class UploadImg(View):
     def post(self, request, *args, **kwargs):
         print(json.loads(request.body))
@@ -110,4 +124,3 @@ class UploadImg(View):
                 print(e)
                 return JsonResponse({'code': 400, 'errmsg': '图片上传失败'})
         return JsonResponse({'code': 200, 'msg': '图片上传成功'})
-
