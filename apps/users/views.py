@@ -26,7 +26,7 @@ class AllCounts(View):
         albums = Albums.objects.all().count()
         pics = Image.objects.all().count()
         counts = [users, albums, pics]
-        return JsonResponse({'code': 200, 'errmsg': 'Get countNum is win', 'counts': counts})
+        return JsonResponse({'code': 200, 'errmsg': 'Get countNum is win', 'data': counts})
 
 
 class UsernameCountView(View):

@@ -29,4 +29,5 @@ urlpatterns = [
     path('', include('apps.verifications.urls')),
     path('', include('apps.imgs.urls')),
     path('', include('apps.albums.urls')),
+    path('', include('apps.comment.urls')),
 ]

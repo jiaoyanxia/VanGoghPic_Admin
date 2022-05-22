@@ -9,9 +9,9 @@ class SmsUtil:
     def __new__(cls, *args, **kwargs):
         if not cls.__instance:
             cls.__instance = super().__new__(cls, *args, **kwargs)
-            cls.smsSdk = SmsSDK(accId='荣联云ID',
-                                accToken='荣联云Token',
-                                appId='荣联云appID')
+            cls.smsSdk = SmsSDK(accId='8aaf07087dc23905017dcb553c9002cb',
+                                accToken='9f0717b195c941d28b882bd914a1c5fd',
+                                appId='8aaf07087dc23905017dcb553d8b02d2')
 
         return cls.__instance
 

@@ -6,7 +6,7 @@ from requests import Response
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.viewsets import ModelViewSet
-
+from Van_GoghPic_admin.settings import FDFS_BASE_URL
 from apps.imgs.serializers import TypeSerializer, ImageSerializer
 from apps.imgs.models import ImageCategoty, Image
 
@@ -20,41 +20,46 @@ class AllType(GenericAPIView):
         lists = []
         for i in instance:
             lists.append(i)
-        # print(lists)
-        return JsonResponse({"code": 200, "errmsg": 'OK', 'lists': lists})
+        return JsonResponse({"code": 200, "errmsg": 'OK', 'data': lists})
+
+
+class Images(View):
+    def post(self, request, *args, **kwargs):
+        datas = json.loads(request.body)
+        print("datas", datas)  # {"typeId":1,"PageNum":0,"datas["PageSize"]":50}
+        TypeId, PageNum, PageSize = datas["typeId"], datas["PageNum"], datas["PageSize"]
+        try:
+            imgUrl = Image.objects.filter(category_id=TypeId)
+            print("cur", PageSize * PageNum)
+            print("per", PageSize * (PageNum + 1))
+            dataList = {}  # [PageSize * PageNum: PageSize]
+            dataList["imgList"] = list(imgUrl.values())[PageSize * (PageNum + 1): PageSize * PageNum:-1]
+            for i in dataList["imgList"]:
+                i["image_link"] = FDFS_BASE_URL + i["image_link"]
+            # print(dataList["imgList"])
+        except Exception as e:
+            print(e)
+            return JsonResponse({"code": 400, "errmsg": 'The type is Error'})
+
+        dataList["total_num"] = len(imgUrl)
+        dataList["typeId"] = TypeId
+        return JsonResponse({"code": 200, "errmsg": 'OK', 'data': dataList})
 
 
 # class Images(View):
 #     def post(self, request, *args, **kwargs):
-#         datas = json.loads(request.body)
-#         print(datas)
+#         id = json.loads(request.body)
 #         try:
-#             imgUrl = Image.objects.filter(category_id=datas["Goodid"])
+#             imgUrl = Image.objects.filter(category_id=id)
 #             imgList = []
 #             for i in imgUrl.values():
 #                 imgList.append(i)
 #         except Exception as e:
 #             print(e)
 #             return JsonResponse({"code": 400, "errmsg": 'The type is Error'})
-#         dict = {}
-#         dict["total_num"] = len(imgList)
-#         dict["imgList"] = imgList
-#         return JsonResponse({"code": 200, "errmsg": 'OK', 'data': dict})
-
-
-class Images(View):
-    def post(self, request, *args, **kwargs):
-        id = json.loads(request.body)
-        try:
-            imgUrl = Image.objects.filter(category_id=id)
-            imgList = []
-            for i in imgUrl.values():
-                imgList.append(i)
-        except Exception as e:
-            print(e)
-            return JsonResponse({"code": 400, "errmsg": 'The type is Error'})
-        return JsonResponse({"code": 200, "errmsg": 'OK', 'imgList': imgList[:50]})
-
+#         imgList = imgList[::-1]
+#         return JsonResponse({"code": 200, "errmsg": 'OK', 'data': imgList[:50]})
+#
 
 class AllImagesView(ModelViewSet):
     # 查询集
@@ -76,17 +81,9 @@ class AllImagesView(ModelViewSet):
         print(type(client))
         if result.get("Status") != 'Upload successed.':
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        print(222)
         # 取出在fastdfs里的地址  把这个地址 保存到数据库
         file_id = result.get("Remote file_id")
         print("file_id", file_id)
-
-        # 3 把图片的地址和sku_id一切用模型类SKUImage保存到数据库
-        # Image.objects.create(sku_id=sku_id, image=file_id)
-        # Image.objects.update()
-
-        # # - 4 返回响应
-        # return Response(status=status.HTTP_201_CREATED)
         return JsonResponse({'code': 200, 'errmsg': 'OK'})
 
 
@@ -107,15 +104,20 @@ class userUpdata(View):
         # print("file_id", file_id)
 
         # # - 4 返回响应
-        return JsonResponse({'code': 200, 'errmsg': 'OK', 'authorImg': file_id})
+        return JsonResponse({'code': 200, 'errmsg': 'OK', 'data': file_id})
         # return JsonResponse({'code': 200, 'errmsg': 'OK'})
 
 
 class UploadImg(View):
     def post(self, request, *args, **kwargs):
-        print(json.loads(request.body))
         # 1. 接收图片数据
         data = json.loads(request.body);
+        # print(data["imgList"])
+        # length = len(data["imgList"])
+        # if length == 0:
+        #     return JsonResponse({'code': 400, 'errmsg': '请上传图片'})
+        # if length > 6:
+        #     return JsonResponse({'code': 400, 'errmsg': '最多上传6张图片'})
         # 2. 循环写入数据库
         for i in data["imgList"]:
             try:

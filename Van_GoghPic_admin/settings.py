@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'apps.verifications',
     'apps.imgs',
     'apps.albums',
+    'apps.comment',
 ]
 
 MIDDLEWARE = [
